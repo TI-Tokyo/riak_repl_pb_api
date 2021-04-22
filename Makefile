@@ -5,13 +5,13 @@ DIALYZER_APPS = kernel stdlib sasl erts inets crypto
 all: deps compile test
 
 compile:
-	@./rebar compile
+	@./rebar3 compile
 
 deps:
-	@./rebar get-deps
+	@./rebar3 get-deps
 
 clean:
-	@./rebar clean
+	@./rebar3 clean
 
 
 include tools.mk
