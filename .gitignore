@@ -1,5 +1,4 @@
-deps
-ebin
+_build/
 include/riak_repl_pb.hrl
+src/riak_repl_pb.erl
 .eunit
-.local_dialyzer_plt
