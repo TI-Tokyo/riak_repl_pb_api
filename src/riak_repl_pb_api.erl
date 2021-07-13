@@ -65,9 +65,9 @@ get_clusterid(Pid, Timeout) ->
     case riakc_pb_socket:tunnel(Pid, ?PB_MSG_GET_CLUSTER_ID,
                                                Pkt, Timeout) of
         {ok, {?PB_MSG_RESP_CLUSTER_ID, Msg}} ->
-            Resp = riak_pb_codec:decode(Msg),
+            Resp = riak_repl_pb:decode_msg(Msg, rpbreplgetclusteridresp),
             case Resp of
-                {rpbreplgetclusteridresp,<<ClusterId/bytes>>} ->
+                {rpbreplgetclusteridresp, <<ClusterId/bytes>>} ->
                     {ok, ClusterId};
                 Other -> Other
             end;
