@@ -1,17 +1,17 @@
 .PHONY: compile deps clean
 
-DIALYZER_APPS = kernel stdlib sasl erts inets crypto
-
-all: deps compile test
+REBAR ?= ./rebar3
+all: deps compile
 
 compile:
-	@./rebar3 compile
+	@$(REBAR) compile
 
 deps:
-	@./rebar3 get-deps
+	@$(REBAR) get-deps
 
 clean:
-	@./rebar3 clean
+	@$(REBAR) clean
 
+distclean:
+	@$(REBAR) clean -a
 
-include tools.mk
