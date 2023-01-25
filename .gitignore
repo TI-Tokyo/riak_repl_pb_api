@@ -2,5 +2,4 @@ _build/
 ebin/
 include/riak_repl_pb.hrl
 src/riak_repl_pb.erl
-.eunit/
-.rebar3/
+rebar.lock
