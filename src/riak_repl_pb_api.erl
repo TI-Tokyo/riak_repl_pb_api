@@ -43,7 +43,7 @@ get(Pid, Bucket, Key, ClusterID) ->
 -spec get(pid(), binary(), binary(), binary(), non_neg_integer()) ->
                  {ok, RiakObj::term()} | {error, term()}.
 get(Pid, Bucket, Key, ClusterID, Timeout) when is_integer(Timeout);
-                                                 Timeout == infinity ->
+                                               Timeout == infinity ->
     get(Pid, Bucket, Key, ClusterID, [], Timeout);
 get(Pid, Bucket, Key, ClusterID, Options) ->
     get(Pid, Bucket, Key, ClusterID, Options, ?DEFAULT_TIMEOUT).
@@ -55,8 +55,8 @@ get(Pid, Bucket, Key, ClusterID, Options, Timeout) ->
                                               cluster_id = ClusterID}),
     Pkt = riak_pb_codec:encode(Req),
     case riakc_pb_socket:tunnel(Pid, ?PB_MSG_PROXY_GET, Pkt, Timeout) of
-        {ok, {MsgCode, Msg}} ->
-            case riak_pb_codec:decode(MsgCode, Msg) of
+        {ok, {?PB_MSG_PROXY_GET, Msg}} ->
+            case riak_repl_pb:decode_msg(Msg, rpbgetresp) of
                 #rpbgetresp{vclock = undefined, content = undefined} ->
                     {error, notfound};
                 #rpbgetresp{vclock = VClock, content = undefined} ->
@@ -65,6 +65,7 @@ get(Pid, Bucket, Key, ClusterID, Options, Timeout) ->
                     Contents = riak_pb_kv_codec:decode_contents(RpbContents),
                     {ok, riakc_obj:new_obj(Bucket, Key, Vclock, Contents)};
                 Other ->
+                    logger:error("Unexpected tunneled response to PB_MSG_PROXY_GET: ~p", [Other]),
                     Other
             end;
         {error, _} = E ->
@@ -81,7 +82,7 @@ get_clusterid(Pid) ->
 get_clusterid(Pid, Timeout) ->
     Pkt = riak_pb_codec:encode(#rpbreplgetclusteridreq{}),
     case riakc_pb_socket:tunnel(Pid, ?PB_MSG_GET_CLUSTER_ID,
-                                               Pkt, Timeout) of
+                                Pkt, Timeout) of
         {ok, {?PB_MSG_RESP_CLUSTER_ID, Msg}} ->
             Resp = riak_repl_pb:decode_msg(Msg, rpbreplgetclusteridresp),
             case Resp of
