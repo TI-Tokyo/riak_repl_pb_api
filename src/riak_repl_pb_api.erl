@@ -55,13 +55,14 @@ get(Pid, Bucket, Key, ClusterID, Options, Timeout) ->
                                               cluster_id = ClusterID}),
     Pkt = riak_pb_codec:encode(Req),
     case riakc_pb_socket:tunnel(Pid, ?PB_MSG_PROXY_GET, Pkt, Timeout) of
-        {ok, {?PB_MSG_PROXY_GET, Msg}} ->
-            case riak_repl_pb:decode_msg(Msg, rpbgetresp) of
+        {ok, {MsgCode, Msg}} ->
+            case riak_pb_codec:decode(MsgCode, Msg) of
                 #rpbgetresp{vclock = undefined, content = undefined} ->
                     {error, notfound};
                 #rpbgetresp{vclock = VClock, content = undefined} ->
                     {error, deleted, VClock};
                 #rpbgetresp{content = RpbContents, vclock = Vclock} ->
+                    logger:debug("Are we here?", []),
                     Contents = riak_pb_kv_codec:decode_contents(RpbContents),
                     {ok, riakc_obj:new_obj(Bucket, Key, Vclock, Contents)};
                 Other ->
