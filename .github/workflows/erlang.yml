@@ -22,6 +22,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Compile
-        run: make
+        run: git config --global --add safe.directory /__w/riak_repl_pb_api/riak_repl_pb_api/ && make
       - name: Run tests
         run: make check
