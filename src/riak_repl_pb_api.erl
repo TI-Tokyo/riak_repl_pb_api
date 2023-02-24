@@ -62,7 +62,6 @@ get(Pid, Bucket, Key, ClusterID, Options, Timeout) ->
                 #rpbgetresp{vclock = VClock, content = undefined} ->
                     {error, deleted, VClock};
                 #rpbgetresp{content = RpbContents, vclock = Vclock} ->
-                    logger:debug("Are we here?", []),
                     Contents = riak_pb_kv_codec:decode_contents(RpbContents),
                     {ok, riakc_obj:new_obj(Bucket, Key, Vclock, Contents)};
                 Other ->
